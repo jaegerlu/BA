@@ -6,6 +6,11 @@ import sys
 import bisect
 import subprocess
 import argparse
+from Bio import SeqIO
+from Bio.Seq import Seq
+from Bio.Align.Applications import MuscleCommandline
+#from StringIO import StringIO
+from Bio import AlignIO
 import os  #
 
 
@@ -316,6 +321,8 @@ def reverse(seq):
     for nt in reversed(seq):
         if nt == 'N':
             revcomp += 'N'
+        elif nt == '-':
+            revcomp += '-'
         else:
             revcomp += revcomp_dict[nt]
     return revcomp
@@ -345,7 +352,7 @@ def printrefSeq(gfa, strand):
                 break
 
 
-def create_xg(genegfa, vg_path):
+def create_xg(genegfa, vg_path, strand, muscle_path):
     command = vg_path[:-2] + './vg'
     xg_file = genegfa[:-3] + 'xg'
     xg_arguments = ['index', genegfa, '-x', xg_file, '-t', '32', '-p']
@@ -360,12 +367,69 @@ def create_xg(genegfa, vg_path):
     stdout, stderr = process.communicate()
     print(stderr.decode().strip())
 
+    fasta_file = genegfa[:-3] + 'fasta'
+    fasta_arguments = ['paths', '-x', xg_file, '-F']
+    process = subprocess.Popen([command] + fasta_arguments, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+    #print(stdout.decode().strip())
+    #print(stderr.decode().strip())
+    fasta = stdout.decode().strip().split('>')[1:]
+    fasta_len = len(fasta)
+    fasta_dic = {}          #ATCCG: [1#2, 2#1, 26#2]
+    #print(fasta)
+    for fa in fasta:
+        fa_split = fa.split('\n')
+        fa_id = fa_split[0]
+        fa_seq = ''.join(fa_split[1:])
+
+        if fa_seq in fasta_dic:
+            fasta_dic[fa_seq].append(fa_id)
+        else:
+            fasta_dic[fa_seq] = [fa_id]
+    records = []
+    for fa_seq, fa_ids in fasta_dic.items():
+        if strand == '1':
+            sequence = Seq(fa_seq)
+        else:
+            sequence = Seq(reverse(fa_seq))
+
+        haplo_sample = fa_ids[0]
+        for id in fa_ids:
+            if id.startswith('grch38'):
+                haplo_sample = id
+        record = SeqIO.SeqRecord(sequence, id = str(len(fa_ids))+'/'+str(fasta_len)+':'+haplo_sample, description='')  # id=str(len(fa_ids))+'/'+str(fasta_len)+':'+','.join(fa_ids)
+        records.append(record)
+    with open(fasta_file, 'w') as f:
+        SeqIO.write(records,f,'fasta')
+
+    msl_file = genegfa[:-3] + 'msa'
+    muscle_split = muscle_path.split('/')
+    if len(muscle_split) == 1:
+        muscle_command = './' + muscle_path
+    else:
+        muscle_command = '/'.join(muscle_split[:-1]) + '/./' + muscle_split[-1]
+    msl_arguments = ['-in',fasta_file,'-out',msl_file,'-clw','-diags','-maxiters','1']
+    process = subprocess.Popen([muscle_command] + msl_arguments, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+    print(stderr.decode().strip())
+
+
+
+
+
+
+
+
+
+
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='extracts genetic information out of pangenome')
     parser.add_argument('-p', '--gfa_path')
     parser.add_argument('-g', '--genes_path')
     parser.add_argument('-v', '--vg_path')
+    parser.add_argument('-m', '--muscle_path')
     parser.add_argument('-i', '--index_output', action='store_true')
     parser.add_argument('-j', '--index_input')
     args = parser.parse_args()
@@ -373,6 +437,7 @@ if __name__ == "__main__":
     gfa_path = args.gfa_path
     genes_path = args.genes_path  # simuliert die eingabe
     vg_path = args.vg_path
+    muscle_path = args.muscle_path
     index_file = False
     if args.index_output:
         index_file = gfa_path[:-3] + 'index'  # vielleicht nicht dynamisch + optional, ob erstellt werden soll
@@ -432,7 +497,6 @@ if __name__ == "__main__":
                                  chrom_start_pos, header)
         print('Mini-GFA Creation abgeschlossen! Referenzpath:')
         printrefSeq(gene_gfa, gene[3])
-        create_xg(gene_gfa, vg_path)
+        create_xg(gene_gfa, vg_path, gene[3], muscle_path)
 
     #print(os.stat(index_file).st_size)
-
