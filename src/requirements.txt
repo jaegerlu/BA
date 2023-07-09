@@ -1,1 +1,3 @@
 PyYAML==6.0
+bio==1.5.9
+pymsaviz==0.4.0
