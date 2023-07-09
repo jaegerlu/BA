@@ -59,7 +59,8 @@
 
 % Title Page
 
-\usepackage[backend=biber, hyperref=true,sorting=none,style=numeric]{biblatex}
+%\usepackage[backend=biber, hyperref=true,sorting=none,style=numeric]{biblatex}
+\usepackage[backend=bibtex,style=ieee]{biblatex}
 \addbibresource{thesis.bib}
 
 
@@ -212,16 +213,16 @@
 
 %%%%%%%%%%%%%%% bibliography%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \cleardoublepage
+\selectlanguage{english}
+\printbibliography[heading=bibintoc]
 
-\printbibliography
-\addcontentsline{toc}{chapter}{Bibliography} %für das Inhaltsverzeichnis
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %\bibliographystyle{unsrt}
 %\bibliography{bib_BA}
 %\printbibliography
-\include{9_acknowledgement}
-\addcontentsline{toc}{chapter}{Acknowledgements} %für das Inhaltsverzeichnis
+%\include{9_acknowledgement}
+%\addcontentsline{toc}{chapter}{Acknowledgements} %für das Inhaltsverzeichnis
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
