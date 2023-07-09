@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import concurrent.futures
 import sys
+import yaml
 # sys.path.append('/home/j/jaegerl/.local/lib/python3.11/site-packages') #fixen iwann
 
 import bisect
@@ -905,8 +906,16 @@ if __name__ == "__main__":
     parser.add_argument('-i', '--generate_index', action='store_true')
     parser.add_argument('-a', '--annotation_path')
     parser.add_argument('-e', '--designer_path', action='store_true')
+    parser.add_argument('-c', '--config', help="File containing default argument values")
+
 
     args = parser.parse_args()
+
+    if args.config:
+        with open(args.config, 'r') as f:
+            config_args = yaml.safe_load(f)
+            parser.set_defaults(**config_args)
+        args = parser.parse_args()
 
     gfa_path = args.gfa_path
     genes_path = False
