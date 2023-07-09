@@ -1,0 +1,43 @@
+\chapter{Materials}
+\label{sec:materials}
+
+\subsection{HPRC Pangenome}
+The human reference genome is a central component in most studies of human genetics.\cite{wang2022human} It includes only one haplotype for each position, creating refrence biases, and thus cannot possibly represent human diversity. To circumvent this problem, the Human Pangenome Reference Consortium (HPRC) has sought a more modern, comprehensive representation of the human genome: the pangenome.
+The goal of the HPRC is to combine the genomes of 1000 samples in the pangenome to represent as many variants of the human genome as possible. These samples are provided by the 1000 Genomes Project (1KGP), which includes data from 26 populations, and by the BioMe Biobank at Mount Sinai as well as a cohort of African American individuals recruited by Washington University.\cite{wang2022human}
+In 2022, the current version of the pangenome was published, which contains two haplotypes of each of a total of 44 samples, as well as the two reference genomes GRCh38 and CHM13, resulting in a total of 90 genomes.
+The graph construction and thus a multiple sequence alignment of whole genome assemblies is highly complex, but possible due to recent improvements in tools like minimap2, cactus or pggb. The pangenome used in this thesis was constructed by the pggb pipeline: For this, pairwise sequence alignments with wfmash are performed first. Then the graph induction with seqwish is executed and finally the graph is normalized by smoothxg. \textbf{pggb Quelle}
+
+The pangenome is stored in the so-called GFA format (Graphical Fragment Assembly). \cite{siren2022gbz} GFA files contain information about DNA fragments, their connections and the underlying sequencing data. It is ideal for representing pangenomes due to its flexibility and ability to represent complex genomic structures. In addition, the GFA format allows for the integration of different sequencing technologies. Pangenome studies often involve different sequencing approaches, such as short-read sequencing and long-read sequencing. Conveniently, there is also already a number of tools for processing and visualizing GFA files, e.g. vg or odgi.
+There are two versions of GFA files: GFA 1 and GFA 2, which extends the GFA 1 format with additional options.
+The pangenome that is used is the GFA 1 type. This is a tab-delimited text format that contains a set of sequences and the information of their different arrangements. The basic idea of the format is to interpret the pangenome as a directed graph that can split and reassemble. Thereby, each node contains a DNA sequence. If the node is always passed through when the graph is traversed, it is a conserved sequence, which is identical in each of the sample genomes at that position. If the graph splits, it is a variant.
+Besides the header line, which often contains the version of the GFA specification, there are three different types of lines, in GFA format: Segments, Links and Paths.
+Segments contain a DNA sequence in addition to a unique segment ID. They reflect the nodes in the graph. Links correspond to the edges in the graph. They link the individual segments together based on their ID and thus form the structure of the pangenome.
+The Paths contain the sequencing data of the samples. They consist of a sequence of consecutive segment IDs, each of which is marked with a '+' or '-'. '-' means here that the reverse complement of the segment is meant, which occurs particularly with reads from the opposite strand.
+In the case of the pangenome used, a pathway consists of a contig of a sample or a complete chromosome sequence of a contained reference genome.
+
+!!!!!!!!!!!Quellen? für gfa?
+
+\subsection{reference genome}
+The development of the human reference genome has been a significant milestone in genomics research. In 2001
+Today the human reference genome is the most used recource in human genetics. \cite{wang2022human}
+\subsubsection{GRCh38}
+GRCh38 contains the merged haplotypes of over 20 induviies, with a single individual forming the majority of the sequence. \cite{wang2022human}
+But sadly numerous challenging regions of the reference genome have remained unresolved, exhibiting issues such as collapsed duplications, missing sequences, and other complexities. \cite{aganezov2022complete} Also only the euchromatic regions in the genome are covered by GRCh38, accounting for only 92\% of the human genome. \cite{nurk2022complete}
+\subsection{CHM13}
+These issues were fixed with the release of the Telomere-to-Telomere genome CHM13, which was released 2022. Now also heterochromic regions are contained. Also the last gaps in the sequence got filled and some structural errors got fixed. \cite{aganezov2022complete}\cite{nurk2022complete}
+
+\cite{}
+
+
+\subsection{gnomAD}
+The Genome Aggregation Database (gnomAD) is presently recognized as the largest and most extensively utilized public repository of population variation, derived from harmonized sequencing data. \cite{gudmundsson2022variant}
+Building upon the foundation laid by the Exome Aggregation Consortium (ExAC), gnomAD encompasses genetic variation data from 76,156 whole genomes in the GRCh38 set obtained from unrelated individuals who were sequenced as part of diverse disease-specific and population genetic studies, making it an extensive and comprehensive resource. \cite{koch2020exploring}\textbf{gnomAD Website Quelle}
+The dataset can be accessed via the gnomAD browser, a web-based platform available at \href{https://gnomad.broadinstitute.org/}{https://gnomad.broadinstitute.org/}.
+gnomAD uses a different pangenomic approach than the HPRC: the direct utilization of an online database.
+With its focus on pangenomics, gnomAD offers a unique perspective by incorporating diverse genomic sequences beyond the traditional reference genome. This enables a more accurate representation of human genetic diversity and a better understanding of rare and common genetic variants across populations.
+By integrating data from multiple sources and sequencing projects, gnomAD offers a vast catalog of genetic variants, including single nucleotide variants (SNVs), insertions and deletions (indels), and structural variants. These variants are annotated with valuable information such as allele frequencies, functional impact predictions, and population-specific metrics, allowing researchers to explore the functional and clinical implications of genetic variation.
+Furthermore, gnomAD gives information about the ethnic distribution of the variants.
+In this work, VCF files containing the variants of genes are downloaded from gnomAD, and then later compared with the variants extracted from the HPRC pangenome. The GRCh38 dataset is chosen over the GRCh37 dataset because of better comparability to the HPRC pangenome, built around the GRCh38 genome as well, even though the GRCh37 dataset has an even greater focus on coding regions due to larger exon data.\textbf{Webseiet Quelle}
+
+\subsection{Additional Data Sources}
+
