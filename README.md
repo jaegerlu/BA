@@ -12,4 +12,6 @@ python3 pan2gene.py -p GFA-pangenome -v vg path -a gene annotation -j
 used pangenome file: hprc-v1.0-pggb.gfa
 used annotation file: gencode.v38.annotation.gtf
 
+output files contain miniGFA, haplotype fasta, vcf and msa files for all selected genes.
+
 Note that pan2 only runs on gfa files like this containing grch38 as reference genome.
